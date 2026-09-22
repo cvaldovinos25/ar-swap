@@ -194,7 +194,19 @@ const appPipelineModule = () => ({
 })
 
 // ---- arranque del motor ----
-const onxrloaded = () => {
+
+// Muestra el mensaje de error REAL en pantalla, para poder diagnosticar
+// problemas sin necesidad de conectar el celular a un computador.
+function showFatalError(error) {
+  console.error(error)
+  const box = document.getElementById('permission-error')
+  const msg = (error && (error.message || error.toString)) ? (error.message || error.toString()) : JSON.stringify(error)
+  box.querySelector('p').textContent = 'Error: ' + msg
+  box.classList.remove('hidden')
+  document.getElementById('loading-screen').classList.add('hidden')
+}
+
+const startXr = () => {
   XR8.addCameraPipelineModules([
     XR8.GlTextureRenderer.pipelineModule(),
     XR8.Threejs.pipelineModule(),
@@ -206,8 +218,7 @@ const onxrloaded = () => {
         document.getElementById('loading-screen').classList.add('hidden')
       },
       onException: (error) => {
-        console.error(error)
-        document.getElementById('permission-error').classList.remove('hidden')
+        showFatalError(error)
       },
     },
   ])
@@ -215,4 +226,34 @@ const onxrloaded = () => {
   XR8.run({ canvas: document.getElementById('camerafeed') })
 }
 
-window.XR8 ? onxrloaded() : window.addEventListener('xrloaded', onxrloaded)
+function launchExperience() {
+  document.getElementById('start-screen').classList.add('hidden')
+  document.getElementById('loading-screen').classList.remove('hidden')
+
+  const go = () => {
+    try {
+      window.XR8 ? startXr() : window.addEventListener('xrloaded', startXr)
+    } catch (error) {
+      showFatalError(error)
+    }
+  }
+
+  // En iPhone (iOS 13+), el acceso a los sensores de movimiento requiere
+  // un permiso explícito, pedido a partir de un toque del usuario. Sin
+  // esto, el rastreo del mundo (SLAM) falla.
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission()
+      .then((state) => {
+        if (state === 'granted') {
+          go()
+        } else {
+          showFatalError(new Error('Permiso de movimiento denegado. Actívalo en Ajustes > Safari > Movimiento y orientación, y recarga la página.'))
+        }
+      })
+      .catch((error) => showFatalError(error))
+  } else {
+    go()
+  }
+}
+
+document.getElementById('start-button').addEventListener('click', launchExperience)
