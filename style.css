@@ -20,6 +20,18 @@ html, body {
   height: 100%;
 }
 
+#start-button {
+  margin-top: 16px;
+  padding: 14px 28px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background: #4fc3f7;
+  color: #000;
+  font-weight: 600;
+}
+
+#start-screen,
 #loading-screen,
 #permission-error {
   position: absolute;
