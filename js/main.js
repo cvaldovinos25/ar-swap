@@ -6,6 +6,19 @@
 // y sale confeti de 3 colores.
 // ============================================================
 
+// ---- log visible en pantalla, para diagnosticar sin consola ----
+function log(msg) {
+  console.log(msg)
+  const box = document.getElementById('debug-log')
+  if (box) {
+    box.classList.remove('hidden')
+    const line = document.createElement('div')
+    line.textContent = msg
+    box.appendChild(line)
+  }
+}
+log('main.js cargado')
+
 const RADIUS_RANGE = [1.5, 3]
 const HEIGHT_RANGE = [0.3, 1.5]
 const FRONT_EXCLUSION_DEG = 60
@@ -92,6 +105,7 @@ const appPipelineModule = () => ({
   name: 'ar-swap-app',
 
   onStart: ({ canvas }) => {
+    log('appPipelineModule onStart (three.js listo)')
     const { scene, camera, renderer } = XR8.Threejs.xrScene()
 
     // luz básica para que los materiales no se vean planos
@@ -207,6 +221,7 @@ function showFatalError(error) {
 }
 
 const startXr = () => {
+  log('startXr(): agregando pipeline modules')
   XR8.addCameraPipelineModules([
     XR8.GlTextureRenderer.pipelineModule(),
     XR8.Threejs.pipelineModule(),
@@ -215,25 +230,35 @@ const startXr = () => {
     {
       name: 'loading-handler',
       onStart: () => {
+        log('loading-handler onStart (cámara corriendo)')
         document.getElementById('loading-screen').classList.add('hidden')
       },
       onException: (error) => {
+        log('onException: ' + (error && error.message))
         showFatalError(error)
       },
     },
   ])
 
+  log('llamando XR8.run()')
   XR8.run({ canvas: document.getElementById('camerafeed') })
+  log('XR8.run() retornó (esto no significa que ya cargó la cámara)')
 }
 
 function launchExperience() {
+  log('botón Comenzar presionado')
   document.getElementById('start-screen').classList.add('hidden')
   document.getElementById('loading-screen').classList.remove('hidden')
 
   const go = () => {
+    log('go(): window.XR8 es ' + (window.XR8 ? 'true' : 'false'))
     try {
-      window.XR8 ? startXr() : window.addEventListener('xrloaded', startXr)
+      window.XR8 ? startXr() : window.addEventListener('xrloaded', () => {
+        log('evento xrloaded recibido')
+        startXr()
+      })
     } catch (error) {
+      log('excepción en go(): ' + error.message)
       showFatalError(error)
     }
   }
@@ -242,16 +267,22 @@ function launchExperience() {
   // un permiso explícito, pedido a partir de un toque del usuario. Sin
   // esto, el rastreo del mundo (SLAM) falla.
   if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    log('pidiendo permiso de movimiento (iOS)')
     DeviceMotionEvent.requestPermission()
       .then((state) => {
+        log('permiso de movimiento: ' + state)
         if (state === 'granted') {
           go()
         } else {
           showFatalError(new Error('Permiso de movimiento denegado. Actívalo en Ajustes > Safari > Movimiento y orientación, y recarga la página.'))
         }
       })
-      .catch((error) => showFatalError(error))
+      .catch((error) => {
+        log('error pidiendo permiso: ' + error.message)
+        showFatalError(error)
+      })
   } else {
+    log('DeviceMotion.requestPermission no existe en este navegador, sigo directo')
     go()
   }
 }
