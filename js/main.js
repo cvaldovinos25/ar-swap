@@ -28,7 +28,7 @@ const CONFIG = {
   INTRO_DISTANCE: 3,
   INTRO_HEIGHT_OFFSET: -0.7,   // metros respecto a los ojos
 
-  RADIUS_RANGE: [1.5, 3],      // distancia de los Salcotín a la persona (m)
+  RADIUS_RANGE: [3, 5],      // distancia de los Salcotín a la persona (m)
   HEIGHT_RANGE: [0.3, 1.5],    // altura del centro sobre el suelo (m), igual que el original
   EYE_HEIGHT: 1.7,             // altura aproximada de los ojos (m)
   FRONT_EXCLUSION_DEG: 60,     // a cada lado del frente donde nunca aparecen (igual que el original)
