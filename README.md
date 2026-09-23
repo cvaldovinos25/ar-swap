@@ -9,15 +9,16 @@ three.js) vive en este repositorio y se publica con GitHub Pages.
 - Muestra el cartel `intro.png` frente a la persona.
 - Tres Salcotín (`1.png`) flotan alrededor, laten y cambian de lugar cada 10 s,
   nunca justo enfrente.
-- Al tocar uno, los tres se encogen, aparece su premio (`2.png`, `3.png` o `4.png`)
-  y sale confeti con `amarillo.png`, `celeste.png` y `rosa.png`.
+- Al tocar uno, los tres salcotines (´1.png´) se encogen, y aparece su premio (`2.png`, `3.png` o `4.png`)
+  con distintos descuentos.
+  y sale confeti (una mezcla de `amarillo.png`, `celeste.png` y `rosa.png`).
 
 ## Cómo funciona
 
 Cámara con `getUserMedia` y giro con `DeviceOrientation` (rastreo de rotación:
 las imágenes quedan fijas al girar, pero no cambian de distancia al caminar).
 Funciona en Safari (iPhone) y Chrome (Android). En computador se prueba
-arrastrando con el mouse.
+arrastrando con el mouse para moverte.
 
 ## Estructura
 
