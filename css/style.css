@@ -1,0 +1,127 @@
+:root {
+  --night: #1b6fd1;
+  --night-soft: rgba(20, 70, 150, 0.88);
+  --gold: #ffffff;
+  --sky: #f06292;
+  --paper: #ffffff;
+  --muted: #dce9fb;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--night);
+  color: var(--paper);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+
+/* Cámara de fondo y escena 3D encima, ambas a pantalla completa */
+#camera-feed,
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#camera-feed {
+  object-fit: cover;
+  z-index: 0;
+  background: radial-gradient(circle at 50% 40%, #3d8ae6, var(--night));
+}
+
+#scene {
+  z-index: 1;
+  display: block;
+}
+
+/* Flecha indicadora */
+#pointer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.pill {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 28px;
+  background: var(--gold);
+  color: #1b6fd1;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pill:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 3px;
+}
+
+/* Pantallas de inicio, carga y error */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px));
+  background: var(--night);
+  text-align: center;
+}
+
+#loading-screen {
+  background: var(--night-soft);
+  font-size: 17px;
+}
+
+.panel {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.panel h1 {
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.panel p {
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.panel .small {
+  font-size: 13px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.intro-art {
+  width: min(92vw, 420px);
+  height: auto;
+  display: block;
+}
