@@ -30,7 +30,7 @@ const CONFIG = {
 
   RADIUS_RANGE: [3, 5],      // distancia de los Salcotín a la persona (m)
   HEIGHT_RANGE: [0.3, 1.5],    // altura del centro sobre el suelo (m), igual que el original
-  EYE_HEIGHT: 1.7,             // altura aproximada de los ojos (m)
+  EYE_HEIGHT: 2.5,             // altura aproximada de los ojos (m)
   FRONT_EXCLUSION_DEG: 60,     // a cada lado del frente donde nunca aparecen (igual que el original)
   MIN_SEPARATION_DEG: 35,      // separación mínima entre Salcotín para que no se tapen
   MOVE_INTERVAL_MS: 5000,
