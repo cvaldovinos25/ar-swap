@@ -1,1 +1,0 @@
-Coloca aquí los archivos de xr-standalone.zip (descárgalo desde https://8th.io/xrjs). El script principal debe quedar en xr8/xr.js
