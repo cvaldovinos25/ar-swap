@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1f1d3d">
+  <title>AR Swap</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Imagen de la cámara trasera (fondo) -->
+  <video id="camera-feed" playsinline muted autoplay></video>
+
+  <!-- Escena 3D transparente encima de la cámara -->
+  <canvas id="scene"></canvas>
+
+  <!-- Flecha que indica hacia dónde girar para encontrar el objeto -->
+  <div id="pointer" class="hidden" aria-hidden="true">
+    <svg viewBox="0 0 40 40" width="44" height="44">
+      <circle cx="20" cy="20" r="18" fill="rgba(31,29,61,0.55)" />
+      <path d="M14 11 L28 20 L14 29 Z" fill="#ffd54f" />
+    </svg>
+  </div>
+
+  <p id="hint" class="hidden"></p>
+
+  <button id="restart-button" class="pill hidden" type="button">Jugar otra vez</button>
+
+  <section id="start-screen" class="overlay">
+    <div class="panel">
+      <div class="orb" aria-hidden="true"></div>
+      <h1>Encuentra el objeto escondido</h1>
+      <p>Está flotando a tu alrededor. Gira con el celular para buscarlo y tócalo cuando lo veas.</p>
+      <button id="start-button" class="pill" type="button">Activar cámara</button>
+      <p class="small">Te vamos a pedir permiso para usar la cámara y el movimiento del teléfono.</p>
+    </div>
+  </section>
+
+  <section id="loading-screen" class="overlay hidden">
+    <p>Activando cámara...</p>
+  </section>
+
+  <section id="error-screen" class="overlay hidden">
+    <div class="panel">
+      <h1>No se pudo iniciar</h1>
+      <p id="error-message"></p>
+      <button class="pill" type="button" onclick="location.reload()">Recargar página</button>
+    </div>
+  </section>
+
+  <!-- three.js alojado en este mismo repositorio (sin CDN) -->
+  <script src="lib/three.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
