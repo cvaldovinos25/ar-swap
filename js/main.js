@@ -33,7 +33,7 @@ const CONFIG = {
   EYE_HEIGHT: 1.7,             // altura aproximada de los ojos (m)
   FRONT_EXCLUSION_DEG: 60,     // a cada lado del frente donde nunca aparecen (igual que el original)
   MIN_SEPARATION_DEG: 35,      // separación mínima entre Salcotín para que no se tapen
-  MOVE_INTERVAL_MS: 10000,
+  MOVE_INTERVAL_MS: 5000,
 
   CAMERA_FOV: 60,
   SMOOTHING: 0.3,              // 0 a 1: más bajo = movimiento más suave
