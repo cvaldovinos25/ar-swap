@@ -28,7 +28,7 @@ const CONFIG = {
   INTRO_DISTANCE: 3,
   INTRO_HEIGHT_OFFSET: -0.7,   // metros respecto a los ojos
 
-  RADIUS_RANGE: [3, 5],      // distancia de los Salcotín a la persona (m)
+  RADIUS_RANGE: [3, 5],        // distancia de los Salcotín a la persona (m)
   HEIGHT_RANGE: [0.3, 1.5],    // altura del centro sobre el suelo (m), igual que el original
   EYE_HEIGHT: 2.5,             // altura aproximada de los ojos (m)
   FRONT_EXCLUSION_DEG: 60,     // a cada lado del frente donde nunca aparecen (igual que el original)
@@ -55,6 +55,7 @@ const $ = (id) => document.getElementById(id)
 let renderer, scene, camera
 let textures = {}
 let intro
+let introAngle = null   // ángulo fijo donde quedó el cartel de inicio
 let salcotines = []   // { mesh, prize, angle }
 let swapped = false
 let moveIntervalId = null
@@ -225,6 +226,7 @@ function faceCamera(mesh) {
 
 function placeIntro() {
   const a = forwardAngle()
+  introAngle = a   // lo dejamos guardado para usarlo como zona prohibida
   intro.position.set(
     Math.sin(a) * CONFIG.INTRO_DISTANCE,
     CONFIG.INTRO_HEIGHT_OFFSET,
@@ -240,19 +242,31 @@ function angleDiff(a, b) {
   return d > Math.PI ? 2 * Math.PI - d : d
 }
 
+// cuánto ángulo (en grados) ocupa, visto desde la cámara, algo de cierto ancho a cierta distancia
+function angularHalfWidthDeg(width, distance) {
+  return (Math.atan2(width / 2, distance) * 180) / Math.PI
+}
+
 function moveAllToRandomPoints() {
   const front = forwardAngle()
   const halfExcluded = toRad(CONFIG.FRONT_EXCLUSION_DEG)
   const allowedSpan = 2 * Math.PI - 2 * halfExcluded
   const used = []
 
+  // reservar la zona donde está el cartel de inicio para que nadie aparezca encima
+  if (introAngle !== null) {
+    const introHalfWidthDeg = angularHalfWidthDeg(CONFIG.INTRO_WIDTH, CONFIG.INTRO_DISTANCE)
+    const salcotinHalfWidthDeg = angularHalfWidthDeg(CONFIG.PLANE_WIDTH, CONFIG.RADIUS_RANGE[0])
+    used.push({ angle: introAngle, minSepDeg: introHalfWidthDeg + salcotinHalfWidthDeg + 10 })
+  }
+
   for (const s of salcotines) {
     let angle
     for (let tries = 0; tries < 15; tries++) {
       angle = front + halfExcluded + Math.random() * allowedSpan
-      if (used.every((u) => angleDiff(u, angle) > toRad(CONFIG.MIN_SEPARATION_DEG))) break
+      if (used.every((u) => angleDiff(u.angle, angle) > toRad(u.minSepDeg))) break
     }
-    used.push(angle)
+    used.push({ angle, minSepDeg: CONFIG.MIN_SEPARATION_DEG })
 
     const radius = randRange(CONFIG.RADIUS_RANGE[0], CONFIG.RADIUS_RANGE[1])
     const y = randRange(CONFIG.HEIGHT_RANGE[0], CONFIG.HEIGHT_RANGE[1]) - CONFIG.EYE_HEIGHT
