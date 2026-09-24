@@ -1,38 +1,34 @@
 // ============================================================
 // BUSCA A SALCOTÍN (versión sin motores externos)
 //
-// Recrea el proyecto de 8th Wall Studio usando solo lo que trae
-// el navegador (cámara + sensores de giro) y three.js alojado en
-// este mismo repositorio.
-//
 // Escena original:
-//   - intro.png  : cartel "¡Busca a Salcotín!" frente a la persona
+//   - intro.png  : cartel "¡Busca a Salcotín!" frente a la cámara
 //   - 1.png (x3) : tres Salcotín que flotan alrededor, cambian de
-//                  lugar cada 10 s y nunca aparecen justo enfrente
-//   - Al tocar uno: los tres se encogen, aparece el premio de ese
-//     Salcotín (2.png, 3.png o 4.png) y sale confeti con
-//     amarillo.png, celeste.png y rosa.png
+//                  lugar cada 5sg de forma aleatorea
+//   - Al tocar uno: los tres se encogen, y aparece el premio de ese
+//     Salcotín seleccionado (2.png, 3.png o 4.png) y sale confeti con
+//     una mezcla de amarillo.png, celeste.png y rosa.png
 //
-// En computador (sin sensores) se mira alrededor arrastrando.
+// En computador (sin sensores) se mira alrededor arrastrando con el mouse en la pantalla.
 // ============================================================
 
 // ---------- Ajustes ----------
 const CONFIG = {
-  // tamaño de cada Salcotín y de los premios (mismo que en 8th Wall: 1.3 x 2.3)
+  // Tamaño de cada plano: Salcotín y premios
   PLANE_WIDTH: 1.3,
   PLANE_HEIGHT: 2.3,
 
-  // cartel de inicio (mismo que en 8th Wall: 2 x 1.4, a unos 3 m)
+  // Cartel de inicio (2 x 1.4, a unos 3 m)
   INTRO_WIDTH: 2,
   INTRO_HEIGHT: 1.4,
   INTRO_DISTANCE: 3,
-  INTRO_HEIGHT_OFFSET: -0.7,   // metros respecto a los ojos
+  INTRO_HEIGHT_OFFSET: -0.7,   // metros respecto a la cámara
 
-  RADIUS_RANGE: [3, 5],        // distancia de los Salcotín a la persona (m)
-  HEIGHT_RANGE: [0.3, 1.5],    // altura del centro sobre el suelo (m), igual que el original
+  RADIUS_RANGE: [3, 5],        // distancia de los Salcotín a la cámara (m)
+  HEIGHT_RANGE: [0.3, 1.5],    // altura del centro sobre el suelo (m)
   EYE_HEIGHT: 2.5,             // altura aproximada de los ojos (m)
-  FRONT_EXCLUSION_DEG: 60,     // a cada lado del frente donde nunca aparecen (igual que el original)
-  MIN_SEPARATION_DEG: 35,      // separación mínima entre Salcotín para que no se tapen
+  FRONT_EXCLUSION_DEG: 60,     // a cada lado del frente donde nunca aparecen
+  MIN_SEPARATION_DEG: 35,      // separación mínima entre Salcotínes para que no se tapen
   MOVE_INTERVAL_MS: 5000,
 
   CAMERA_FOV: 60,
