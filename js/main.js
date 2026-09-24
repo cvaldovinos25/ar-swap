@@ -249,7 +249,7 @@ function moveAllToRandomPoints() {
   const allowedSpan = 2 * Math.PI - 2 * halfExcluded
   const used = []
 
-  // reservar la zona donde está el cartel de inicio para que nadie aparezca encima
+  // reservar la zona donde está el cartel de inicio (intro.png) para que nada aparezca encima
   if (introAngle !== null) {
     const introHalfWidthDeg = angularHalfWidthDeg(CONFIG.INTRO_WIDTH, CONFIG.INTRO_DISTANCE)
     const salcotinHalfWidthDeg = angularHalfWidthDeg(CONFIG.PLANE_WIDTH, CONFIG.RADIUS_RANGE[0])
