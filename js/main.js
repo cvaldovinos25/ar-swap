@@ -56,6 +56,8 @@ const HINT_MESSAGES = [
   '¡Atrapa a Salcotín cuando lo encuentres!',
 ]
 
+const PRIZE_MESSAGE = '¡Toma un pantallazo y canjea tu premio en caja!'
+
 const randRange = (min, max) => Math.random() * (max - min) + min
 const toRad = (deg) => (deg * Math.PI) / 180
 const $ = (id) => document.getElementById(id)
@@ -377,7 +379,7 @@ function onCatch(caught) {
   caught.prize.position.copy(caught.mesh.position)
   faceCamera(caught.prize)
   caught.prize.visible = true
-  animateScale(caught.prize, { from: 0, to: 1, duration: 300 })
+  animateScale(caught.prize, { from: 0, to: 1, duration: 300, onComplete: showPrizeMessage })
 
   // confeti (misma gravedad que cada emisor original)
   const pos = caught.mesh.position.clone()
@@ -538,6 +540,20 @@ function hideHint() {
   clearTimeout(hintSwapTimeoutId)
   const hint = $('hint-text')
   if (hint) hint.classList.add('hidden')
+}
+
+// mensaje fijo (sin alternar) que se muestra al aparecer el premio
+function showPrizeMessage() {
+  const hint = $('hint-text')
+  const inner = $('hint-text-inner')
+  if (!hint || !inner) return
+
+  clearInterval(hintIntervalId)
+  clearTimeout(hintSwapTimeoutId)
+  inner.classList.remove('visible')
+  inner.textContent = PRIZE_MESSAGE
+  hint.classList.remove('hidden')
+  requestAnimationFrame(() => inner.classList.add('visible'))
 }
 
 // esconde el cartel de inicio y lo reemplaza por el texto de ayuda
