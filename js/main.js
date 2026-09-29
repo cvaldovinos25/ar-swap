@@ -34,6 +34,11 @@ const CONFIG = {
   CAMERA_FOV: 60,
   SMOOTHING: 0.3,              // 0 a 1: más bajo = movimiento más suave
   SHOW_POINTER: false,         // true = flecha que indica dónde hay un Salcotín
+
+  // Termómetro: qué tan cerca (en coordenadas de pantalla) hay que estar
+  // de un Salcotín para pasar a "tibio". 1 = borde de la pantalla,
+  // valores más grandes = se pone tibio antes (todavía fuera de cámara).
+  THERMO_WARM_MARGIN: 1.9,
 }
 
 const ASSETS = {
@@ -342,6 +347,7 @@ function onCatch(caught) {
   swapped = true
   clearInterval(moveIntervalId)
   $('pointer').classList.add('hidden')
+  $('thermo').classList.add('hidden')
 
   // los tres Salcotín se encogen
   for (const s of salcotines) {
@@ -446,7 +452,51 @@ function updatePointer() {
 }
 
 // ============================================================
-// 6. Bucle de dibujo
+// 6. Termómetro (frío / tibio / caliente)
+// ============================================================
+let thermoLevel = null
+
+function setThermoLevel(level) {
+  const thermo = $('thermo')
+  const label = $('thermo-label')
+  if (!thermo || level === thermoLevel) return
+  thermoLevel = level
+  thermo.classList.remove('level-frio', 'level-tibio', 'level-caliente')
+  thermo.classList.add('level-' + level)
+  if (label) {
+    label.textContent = level === 'frio' ? 'Frío' : level === 'tibio' ? 'Tibio' : '¡Caliente!'
+  }
+}
+
+function updateThermometer() {
+  if (swapped) return
+
+  let hot = false
+  let warm = false
+
+  for (const s of salcotines) {
+    if (!s.mesh.visible) continue
+
+    // ¿está delante de la cámara?
+    tmpVec.copy(s.mesh.position).applyMatrix4(camera.matrixWorldInverse)
+    if (tmpVec.z >= 0) continue
+
+    // coordenadas normalizadas de pantalla (-1..1 = dentro de cámara)
+    const ndc = s.mesh.position.clone().project(camera)
+    if (Math.abs(ndc.x) < 1 && Math.abs(ndc.y) < 1) {
+      hot = true
+      break
+    }
+    if (Math.abs(ndc.x) < CONFIG.THERMO_WARM_MARGIN && Math.abs(ndc.y) < CONFIG.THERMO_WARM_MARGIN) {
+      warm = true
+    }
+  }
+
+  setThermoLevel(hot ? 'caliente' : warm ? 'tibio' : 'frio')
+}
+
+// ============================================================
+// 7. Bucle de dibujo
 // ============================================================
 function loop(now) {
   if (dragMode) updateTargetFromDrag()
@@ -467,12 +517,13 @@ function loop(now) {
   }
 
   updatePointer()
+  updateThermometer()
   renderer.render(scene, camera)
   requestAnimationFrame(loop)
 }
 
 // ============================================================
-// 7. Arranque
+// 8. Arranque
 // ============================================================
 async function launchExperience() {
   if (started) return
@@ -522,6 +573,7 @@ async function launchExperience() {
     salcotines.forEach((s) => { s.mesh.visible = true })
     moveIntervalId = setInterval(moveAllToRandomPoints, CONFIG.MOVE_INTERVAL_MS)
     $('loading-screen').classList.add('hidden')
+    $('thermo').classList.remove('hidden')
   }, 1200)
 }
 
