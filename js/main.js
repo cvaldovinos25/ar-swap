@@ -39,6 +39,9 @@ const CONFIG = {
   // de un Salcotín para pasar a "tibio". 1 = borde de la pantalla,
   // valores más grandes = se pone tibio antes (todavía fuera de cámara).
   THERMO_WARM_MARGIN: 1.9,
+
+  INTRO_HIDE_DELAY_MS: 5000,   // cuánto dura el cartel de inicio en pantalla
+  HINT_INTERVAL_MS: 10000,     // cada cuánto alterna el texto de ayuda
 }
 
 const ASSETS = {
@@ -47,6 +50,11 @@ const ASSETS = {
   prizes: ['assets/2.png', 'assets/3.png', 'assets/4.png'],
   confetti: ['assets/amarillo.png', 'assets/celeste.png', 'assets/rosa.png'],
 }
+
+const HINT_MESSAGES = [
+  '¡Escanea tu alrededor!',
+  '¡Atrapa a Salcotín cuando lo encuentres!',
+]
 
 const randRange = (min, max) => Math.random() * (max - min) + min
 const toRad = (deg) => (deg * Math.PI) / 180
@@ -62,6 +70,10 @@ let swapped = false
 let moveIntervalId = null
 let dragMode = false
 let started = false
+let introHideTimeoutId = null
+let hintIntervalId = null
+let hintSwapTimeoutId = null
+let hintIndex = 0
 
 // ============================================================
 // 1. Orientación del celular -> rotación de la cámara 3D
@@ -348,6 +360,8 @@ function onCatch(caught) {
   clearInterval(moveIntervalId)
   $('pointer').classList.add('hidden')
   $('thermo').classList.add('hidden')
+  clearTimeout(introHideTimeoutId)
+  hideHint()
 
   // los tres Salcotín se encogen
   for (const s of salcotines) {
@@ -496,7 +510,51 @@ function updateThermometer() {
 }
 
 // ============================================================
-// 7. Bucle de dibujo
+// 7. Cartel de inicio (intro.png) y texto de ayuda que lo reemplaza
+// ============================================================
+function showHint() {
+  const hint = $('hint-text')
+  const inner = $('hint-text-inner')
+  if (!hint || !inner) return
+
+  hintIndex = 0
+  inner.textContent = HINT_MESSAGES[hintIndex]
+  hint.classList.remove('hidden')
+  // en el frame siguiente, para que la transición de opacidad se note
+  requestAnimationFrame(() => inner.classList.add('visible'))
+
+  hintIntervalId = setInterval(() => {
+    inner.classList.remove('visible')
+    hintSwapTimeoutId = setTimeout(() => {
+      hintIndex = (hintIndex + 1) % HINT_MESSAGES.length
+      inner.textContent = HINT_MESSAGES[hintIndex]
+      inner.classList.add('visible')
+    }, 450) // calza con la duración de la transición en css/style.css
+  }, CONFIG.HINT_INTERVAL_MS)
+}
+
+function hideHint() {
+  clearInterval(hintIntervalId)
+  clearTimeout(hintSwapTimeoutId)
+  const hint = $('hint-text')
+  if (hint) hint.classList.add('hidden')
+}
+
+// esconde el cartel de inicio y lo reemplaza por el texto de ayuda
+function scheduleIntroHide() {
+  introHideTimeoutId = setTimeout(() => {
+    animateScale(intro, {
+      from: intro.scale.x,
+      to: 0,
+      duration: 400,
+      onComplete: () => { intro.visible = false },
+    })
+    showHint()
+  }, CONFIG.INTRO_HIDE_DELAY_MS)
+}
+
+// ============================================================
+// 8. Bucle de dibujo
 // ============================================================
 function loop(now) {
   if (dragMode) updateTargetFromDrag()
@@ -523,7 +581,7 @@ function loop(now) {
 }
 
 // ============================================================
-// 8. Arranque
+// 9. Arranque
 // ============================================================
 async function launchExperience() {
   if (started) return
@@ -574,6 +632,7 @@ async function launchExperience() {
     moveIntervalId = setInterval(moveAllToRandomPoints, CONFIG.MOVE_INTERVAL_MS)
     $('loading-screen').classList.add('hidden')
     $('thermo').classList.remove('hidden')
+    scheduleIntroHide()
   }, 1200)
 }
 
