@@ -145,6 +145,44 @@ html, body {
   }
 }
 
+/* Texto de ayuda inferior: reemplaza al cartel de inicio (intro.png) */
+#hint-text {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+  pointer-events: none;
+}
+
+#hint-text.hidden {
+  display: none !important;
+}
+
+#hint-text-inner {
+  display: inline-block;
+  max-width: 92vw;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.01em;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+#hint-text-inner.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .pill {
   appearance: none;
   border: 0;
